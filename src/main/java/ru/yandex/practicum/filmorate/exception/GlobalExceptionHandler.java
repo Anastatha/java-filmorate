@@ -20,7 +20,8 @@ public final class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String handleValidationException(final MethodArgumentNotValidException ex) {
+    public String handleValidationException(
+            final MethodArgumentNotValidException ex) {
         return ex.getBindingResult()
                 .getFieldErrors()
                 .stream()
