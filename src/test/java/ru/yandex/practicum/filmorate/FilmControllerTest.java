@@ -17,16 +17,14 @@ class FilmControllerTest {
     private MockMvc mockMvc;
 
     @Test
-    void shouldReturn400WhenBodyEmpty() throws Exception
-    {
+    void shouldReturn400WhenBodyEmpty() throws Exception {
         mockMvc.perform(post("/films")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    void shouldReturn400WhenInvalidData() throws Exception
-    {
+    void shouldReturn400WhenInvalidData() throws Exception {
         String invalidJson = """
                 {
                     "name": "",
@@ -43,8 +41,7 @@ class FilmControllerTest {
     }
 
     @Test
-    void shouldCreateFilmWhenValid() throws Exception
-    {
+    void shouldCreateFilmWhenValid() throws Exception {
         String validJson = """
                 {
                     "name": "Film",
