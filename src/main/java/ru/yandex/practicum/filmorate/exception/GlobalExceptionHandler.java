@@ -24,7 +24,9 @@ public final class GlobalExceptionHandler {
         return ex.getBindingResult()
                 .getFieldErrors()
                 .stream()
-                .map(e -> e.getField() + ": " + e.getDefaultMessage())
+                .map(e -> e.getField()
+                        + ": "
+                        + e.getDefaultMessage())
                 .collect(Collectors.joining(", "));
     }
 
