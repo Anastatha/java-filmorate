@@ -18,9 +18,7 @@ class UserControllerTest {
 
     @Test
     void shouldReturn400WhenEmptyBody() throws Exception {
-        mockMvc.perform(post("/users")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
+        mockMvc.perform(post("/users").contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest());
     }
 
     @Test
@@ -33,10 +31,7 @@ class UserControllerTest {
                 }
                 """;
 
-        mockMvc.perform(post("/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(invalidJson))
-                .andExpect(status().isBadRequest());
+        mockMvc.perform(post("/users").contentType(MediaType.APPLICATION_JSON).content(invalidJson)).andExpect(status().isBadRequest());
     }
 
     @Test
@@ -49,9 +44,6 @@ class UserControllerTest {
                 }
                 """;
 
-        mockMvc.perform(post("/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(validJson))
-                .andExpect(status().isOk());
+        mockMvc.perform(post("/users").contentType(MediaType.APPLICATION_JSON).content(validJson)).andExpect(status().isOk());
     }
 }

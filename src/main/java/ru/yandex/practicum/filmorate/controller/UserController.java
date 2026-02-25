@@ -37,7 +37,7 @@ public class UserController {
     }
 
     @PutMapping
-    public User update(@Valid  @RequestBody User user) {
+    public User update(@Valid @RequestBody User user) {
         if (user.getId() == null) {
             throw new IllegalArgumentException("Id должен быть указан");
         }
