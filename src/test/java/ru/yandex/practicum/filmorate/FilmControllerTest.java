@@ -1,11 +1,15 @@
 package ru.yandex.practicum.filmorate;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.yandex.practicum.filmorate.controller.FilmController;
+import ru.yandex.practicum.filmorate.model.Film;
+
+import java.time.LocalDate;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -16,6 +20,9 @@ class FilmControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @Test
     void shouldReturn400WhenBodyEmpty() throws Exception {
         mockMvc.perform(post("/films")
@@ -25,14 +32,13 @@ class FilmControllerTest {
 
     @Test
     void shouldReturn400WhenInvalidData() throws Exception {
-        String invalidJson = """
-                {
-                    "name": "",
-                    "description": "desc",
-                    "releaseDate": "2000-01-01",
-                    "duration": 100
-                }
-                """;
+        Film invalidFilm = new Film();
+        invalidFilm.setName("");
+        invalidFilm.setDescription("desc");
+        invalidFilm.setReleaseDate(LocalDate.parse("2000-01-01"));
+        invalidFilm.setDuration(100);
+
+        String invalidJson = objectMapper.writeValueAsString(invalidFilm);
 
         mockMvc.perform(post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -42,14 +48,13 @@ class FilmControllerTest {
 
     @Test
     void shouldCreateFilmWhenValid() throws Exception {
-        String validJson = """
-                {
-                    "name": "Film",
-                    "description": "desc",
-                    "releaseDate": "2000-01-01",
-                    "duration": 100
-                }
-                """;
+        Film invalidFilm = new Film();
+        invalidFilm.setName("Film");
+        invalidFilm.setDescription("desc");
+        invalidFilm.setReleaseDate(LocalDate.parse("2000-01-01"));
+        invalidFilm.setDuration(100);
+
+        String validJson = objectMapper.writeValueAsString(invalidFilm);
 
         mockMvc.perform(post("/films")
                         .contentType(MediaType.APPLICATION_JSON)
