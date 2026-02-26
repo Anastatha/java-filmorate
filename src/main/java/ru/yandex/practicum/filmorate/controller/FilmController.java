@@ -20,7 +20,7 @@ import java.util.NoSuchElementException;
 @RestController
 @RequestMapping("/films")
 @Slf4j
-public final class FilmController {
+public class FilmController {
     private final Map<Long, Film> films = new HashMap<>();
     private static final LocalDate CINEMA_BIRTHDAY = LocalDate.of(1895, 12, 28);
 

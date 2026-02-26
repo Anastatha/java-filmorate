@@ -18,7 +18,7 @@ import java.util.NoSuchElementException;
 @RestController
 @RequestMapping("/users")
 @Slf4j
-public final class UserController {
+public class UserController {
 
     private final Map<Long, User> users = new HashMap<>();
 
