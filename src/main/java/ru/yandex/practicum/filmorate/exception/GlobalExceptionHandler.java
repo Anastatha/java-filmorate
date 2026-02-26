@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
@@ -14,26 +15,31 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(NoSuchElementException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String handleNotFound(final NoSuchElementException ex) {
-        return ex.getMessage();
+    public Map<String, String> handleNotFound(
+            final NoSuchElementException ex) {
+        return Map.of("error", ex.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String handleValidationException(
+    public Map<String, String> handleValidationException(
             final MethodArgumentNotValidException ex) {
-        return ex.getBindingResult()
+
+        String message = ex.getBindingResult()
                 .getFieldErrors()
                 .stream()
-                .map(e -> e.getField()
+                .map(error -> error.getField()
                         + ": "
-                        + e.getDefaultMessage())
+                        + error.getDefaultMessage())
                 .collect(Collectors.joining(", "));
+
+        return Map.of("error", message);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String handleIllegalArgument(final IllegalArgumentException ex) {
-        return ex.getMessage();
+    public Map<String, String> handleIllegalArgument(
+            final IllegalArgumentException ex) {
+        return Map.of("error", ex.getMessage());
     }
 }
