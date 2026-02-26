@@ -21,6 +21,7 @@ import java.util.NoSuchElementException;
 public class UserController {
 
     private final Map<Long, User> users = new HashMap<>();
+    private long nextUserId = 1;
 
     @GetMapping
     public Collection<User> getUsers() {
@@ -33,7 +34,7 @@ public class UserController {
             user.setName(user.getLogin());
         }
 
-        user.setId(getNextId());
+        user.setId(nextUserId++);
         users.put(user.getId(), user);
 
         log.info("Создан пользователь: {}", user);
@@ -59,14 +60,5 @@ public class UserController {
         log.info("Обновлён пользователь: {}", user);
 
         return user;
-    }
-
-    private long getNextId() {
-        long currentMaxId = users.keySet()
-                .stream()
-                .mapToLong(id -> id)
-                .max()
-                .orElse(0);
-        return ++currentMaxId;
     }
 }

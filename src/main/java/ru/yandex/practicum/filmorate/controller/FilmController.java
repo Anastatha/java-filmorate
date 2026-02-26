@@ -23,6 +23,7 @@ import java.util.NoSuchElementException;
 public class FilmController {
     private final Map<Long, Film> films = new HashMap<>();
     private static final LocalDate CINEMA_BIRTHDAY = LocalDate.of(1895, 12, 28);
+    private long nextFilmId = 1;
 
     @GetMapping
     public Collection<Film> getFilms() {
@@ -33,7 +34,7 @@ public class FilmController {
     public Film create(@Valid @RequestBody final Film film) {
         validateReleaseDate(film);
 
-        film.setId(getNextId());
+        film.setId(nextFilmId++);
 
         films.put(film.getId(), film);
 
@@ -59,15 +60,6 @@ public class FilmController {
         log.info("Обновлён фильм: {}", film);
 
         return film;
-    }
-
-    private long getNextId() {
-        long currentMaxId = films.keySet()
-                .stream()
-                .mapToLong(id -> id)
-                .max()
-                .orElse(0);
-        return ++currentMaxId;
     }
 
     private void validateReleaseDate(final Film film) {
