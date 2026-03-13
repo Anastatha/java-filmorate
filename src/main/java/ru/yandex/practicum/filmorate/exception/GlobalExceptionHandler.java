@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.exception;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -41,5 +42,18 @@ public class GlobalExceptionHandler {
     public Map<String, String> handleIllegalArgument(
             final IllegalArgumentException ex) {
         return Map.of("error", ex.getMessage());
+    }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public Map<String, String> handleException(Exception ex) {
+        return Map.of("error", "Произошла внутренняя ошибка сервера");
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleHttpMessageNotReadable(
+            HttpMessageNotReadableException ex) {
+        return Map.of("error", "Тело запроса отсутствует или имеет неверный формат");
     }
 }
