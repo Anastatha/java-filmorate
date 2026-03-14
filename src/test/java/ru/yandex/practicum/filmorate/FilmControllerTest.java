@@ -28,9 +28,6 @@ class FilmControllerTest {
     private ObjectMapper objectMapper;
 
     @MockBean
-    private FilmStorage filmStorage;
-
-    @MockBean
     private FilmService filmService;
 
     @Test
@@ -65,7 +62,7 @@ class FilmControllerTest {
         film.setReleaseDate(LocalDate.parse("2000-01-01"));
         film.setDuration(100);
 
-        when(filmStorage.create(org.mockito.ArgumentMatchers.any(Film.class)))
+        when(filmService.create(org.mockito.ArgumentMatchers.any(Film.class)))
                 .thenReturn(film);
 
         String validJson = objectMapper.writeValueAsString(film);

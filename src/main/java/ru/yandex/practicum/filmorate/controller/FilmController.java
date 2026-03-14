@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import java.util.Collection;
 import java.util.List;
@@ -15,22 +14,20 @@ import java.util.List;
 @RequestMapping("/films")
 @Slf4j
 public class FilmController {
-    private final FilmStorage filmStorage;
     private final FilmService filmService;
 
-    public FilmController(final FilmStorage filmStorage, final FilmService filmService) {
-        this.filmStorage = filmStorage;
+    public FilmController(final FilmService filmService) {
         this.filmService = filmService;
     }
 
     @GetMapping
     public Collection<Film> getFilms() {
-        return filmStorage.getFilms();
+        return filmService.getFilms();
     }
 
     @PostMapping
     public Film create(@Valid @RequestBody final Film film) {
-        Film createdFilm = filmStorage.create(film);
+        Film createdFilm = filmService.create(film);
         log.info("Добавлен фильм: {}", createdFilm);
         return createdFilm;
     }
@@ -41,14 +38,14 @@ public class FilmController {
             throw new IllegalArgumentException("Id должен быть указан");
         }
 
-        Film updatedFilm = filmStorage.update(film);
+        Film updatedFilm = filmService.update(film);
         log.info("Обновлён фильм: {}", updatedFilm);
         return updatedFilm;
     }
 
     @GetMapping("/{id}")
     public Film getFilmById(@PathVariable Long id) {
-        return filmStorage.findById(id);
+        return filmService.findById(id);
     }
 
     @PutMapping("/{id}/like/{userId}")

@@ -31,9 +31,6 @@ class UserControllerTest {
     @MockBean
     private UserService userService;
 
-    @MockBean
-    private UserStorage userStorage;
-
     @Test
     void shouldReturn400WhenEmptyBody() throws Exception {
         mockMvc.perform(post("/users")
@@ -63,7 +60,7 @@ class UserControllerTest {
         validUser.setLogin("login");
         validUser.setBirthday(LocalDate.parse("2000-01-01"));
 
-        when(userStorage.create(any(User.class))).thenReturn(validUser);
+        when(userService.create(any(User.class))).thenReturn(validUser);
         String validJson = objectMapper.writeValueAsString(validUser);
 
         mockMvc.perform(post("/users")

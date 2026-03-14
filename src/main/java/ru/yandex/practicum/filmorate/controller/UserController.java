@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.Collection;
 import java.util.List;
@@ -14,22 +13,20 @@ import java.util.List;
 @RequestMapping("/users")
 @Slf4j
 public class UserController {
-    private final UserStorage userStorage;
     private final UserService userService;
 
-    public UserController(UserStorage userStorage, UserService userService) {
-        this.userStorage = userStorage;
+    public UserController(UserService userService) {
         this.userService = userService;
     }
 
     @GetMapping
     public Collection<User> getUsers() {
-        return userStorage.getUsers();
+        return userService.getUsers();
     }
 
     @PostMapping
     public User create(@Valid @RequestBody final User user) {
-        User createUser = userStorage.create(user);
+        User createUser = userService.create(user);
         log.info("Создан пользователь: {}", createUser);
 
         return createUser;
@@ -41,7 +38,7 @@ public class UserController {
             throw new IllegalArgumentException("Id должен быть указан");
         }
 
-        User updatedUser = userStorage.update(user);
+        User updatedUser = userService.update(user);
         log.info("Обновлён пользователь: {}", updatedUser);
 
         return updatedUser;
@@ -49,7 +46,7 @@ public class UserController {
 
     @GetMapping("/{id}")
     public User getUserById(@PathVariable Long id) {
-        return userStorage.findById(id);
+        return userService.findById(id);
     }
 
     @PutMapping("/{id}/friends/{friendId}")
