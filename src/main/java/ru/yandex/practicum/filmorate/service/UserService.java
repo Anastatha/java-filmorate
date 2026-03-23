@@ -1,0 +1,83 @@
+package ru.yandex.practicum.filmorate.service;
+
+import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+@Service
+public class UserService {
+    private final UserStorage userStorage;
+
+    public UserService(UserStorage userStorage) {
+        this.userStorage = userStorage;
+    }
+
+    public void addFriend(final Long userId, final Long friendId) {
+        User user = userStorage.findById(userId);
+        User friend = userStorage.findById(friendId);
+
+        user.getFriends().add(friendId);
+        friend.getFriends().add(userId);
+    }
+
+    public void removeFriend(Long userId, Long friendId) {
+        User user = userStorage.findById(userId);
+        User friend = userStorage.findById(friendId);
+
+        user.getFriends().remove(friendId);
+        friend.getFriends().remove(userId);
+    }
+
+    public List<User> getCommonFriends(Long userId, Long otherId) {
+        User user = userStorage.findById(userId);
+        User other = userStorage.findById(otherId);
+
+        Set<Long> commonIds = user.getFriends()
+                .stream()
+                .filter(other.getFriends()::contains)
+                .collect(Collectors.toSet());
+
+        return commonIds.stream()
+                .map(userStorage::findById)
+                .collect(Collectors.toList());
+    }
+
+    public List<User> getFriends(Long userId) {
+        User user = userStorage.findById(userId);
+
+        return user.getFriends()
+                .stream()
+                .map(userStorage::findById)
+                .toList();
+    }
+
+    public Collection<User> getUsers() {
+        return userStorage.getUsers();
+    }
+
+    public User create(final User user) {
+        if (user.getName() == null || user.getName().isBlank()) {
+            user.setName(user.getLogin());
+        }
+
+        return userStorage.create(user);
+    }
+
+    public User update(final User user) {
+        if (user.getName() == null || user.getName().isBlank()) {
+            user.setName(user.getLogin());
+        }
+
+        return userStorage.update(user);
+    }
+
+    public User findById(final Long id) {
+        return userStorage.findById(id);
+    }
+
+}
