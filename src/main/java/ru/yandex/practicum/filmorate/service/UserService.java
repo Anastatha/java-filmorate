@@ -21,6 +21,7 @@ public class UserService {
         User friend = userStorage.findById(friendId);
 
         user.getFriends().put(friendId, FriendshipStatus.UNCONFIRMED);
+        friend.getFriends().put(userId, FriendshipStatus.UNCONFIRMED);
     }
 
     public void confirmFriend(Long userId, Long friendId) {
@@ -62,7 +63,7 @@ public class UserService {
         User user = userStorage.findById(userId);
 
         return user.getFriends().entrySet().stream()
-                .filter(entry -> entry.getValue() == FriendshipStatus.CONFIRMED)
+//                .filter(entry -> entry.getValue() == FriendshipStatus.CONFIRMED)
                 .map(entry -> userStorage.findById(entry.getKey()))
                 .toList();
     }
