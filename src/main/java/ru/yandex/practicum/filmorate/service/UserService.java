@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.model.FriendshipStatus;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -21,8 +22,18 @@ public class UserService {
         User user = userStorage.findById(userId);
         User friend = userStorage.findById(friendId);
 
-        user.getFriends().add(friendId);
-        friend.getFriends().add(userId);
+        user.getFriends().put(friendId, FriendshipStatus.UNCONFIRMED);
+        friend.getFriends().put(userId, FriendshipStatus.UNCONFIRMED);
+    }
+
+    public void confirmFriend(final Long userId, final Long friendId) {
+        User user = userStorage.findById(userId);
+        User friend = userStorage.findById(friendId);
+
+        if (user.getFriends().containsKey(friendId) && friend.getFriends().containsKey(userId)) {
+            user.getFriends().put(friendId, FriendshipStatus.CONFIRMED);
+            friend.getFriends().put(userId, FriendshipStatus.CONFIRMED);
+        }
     }
 
     public void removeFriend(Long userId, Long friendId) {
@@ -37,9 +48,9 @@ public class UserService {
         User user = userStorage.findById(userId);
         User other = userStorage.findById(otherId);
 
-        Set<Long> commonIds = user.getFriends()
+        Set<Long> commonIds = user.getFriends().keySet()
                 .stream()
-                .filter(other.getFriends()::contains)
+                .filter(other.getFriends().keySet()::contains)
                 .collect(Collectors.toSet());
 
         return commonIds.stream()
@@ -50,7 +61,7 @@ public class UserService {
     public List<User> getFriends(Long userId) {
         User user = userStorage.findById(userId);
 
-        return user.getFriends()
+        return user.getFriends().keySet()
                 .stream()
                 .map(userStorage::findById)
                 .toList();
