@@ -5,9 +5,7 @@ import ru.yandex.practicum.filmorate.model.FriendshipStatus;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,16 +21,17 @@ public class UserService {
         User friend = userStorage.findById(friendId);
 
         user.getFriends().put(friendId, FriendshipStatus.UNCONFIRMED);
-        friend.getFriends().put(userId, FriendshipStatus.UNCONFIRMED);
     }
 
-    public void confirmFriend(final Long userId, final Long friendId) {
+    public void confirmFriend(Long userId, Long friendId) {
         User user = userStorage.findById(userId);
         User friend = userStorage.findById(friendId);
 
-        if (user.getFriends().containsKey(friendId) && friend.getFriends().containsKey(userId)) {
-            user.getFriends().put(friendId, FriendshipStatus.CONFIRMED);
+        if (friend.getFriends().get(userId) == FriendshipStatus.UNCONFIRMED) {
             friend.getFriends().put(userId, FriendshipStatus.CONFIRMED);
+            user.getFriends().put(friendId, FriendshipStatus.CONFIRMED);
+        } else {
+            throw new NoSuchElementException("Заявка на дружбу не найдена");
         }
     }
 
@@ -48,22 +47,23 @@ public class UserService {
         User user = userStorage.findById(userId);
         User other = userStorage.findById(otherId);
 
-        Set<Long> commonIds = user.getFriends().keySet()
-                .stream()
-                .filter(other.getFriends().keySet()::contains)
+        Set<Long> commonIds = user.getFriends().entrySet().stream()
+                .filter(e -> e.getValue() == FriendshipStatus.CONFIRMED)
+                .map(Map.Entry::getKey)
+                .filter(id -> other.getFriends().get(id) == FriendshipStatus.CONFIRMED)
                 .collect(Collectors.toSet());
 
         return commonIds.stream()
                 .map(userStorage::findById)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public List<User> getFriends(Long userId) {
         User user = userStorage.findById(userId);
 
-        return user.getFriends().keySet()
-                .stream()
-                .map(userStorage::findById)
+        return user.getFriends().entrySet().stream()
+                .filter(entry -> entry.getValue() == FriendshipStatus.CONFIRMED)
+                .map(entry -> userStorage.findById(entry.getKey()))
                 .toList();
     }
 
