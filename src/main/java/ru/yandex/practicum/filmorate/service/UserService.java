@@ -21,7 +21,6 @@ public class UserService {
         User friend = userStorage.findById(friendId);
 
         user.getFriends().put(friendId, FriendshipStatus.UNCONFIRMED);
-        friend.getFriends().put(userId, FriendshipStatus.UNCONFIRMED);
     }
 
     public void confirmFriend(Long userId, Long friendId) {
