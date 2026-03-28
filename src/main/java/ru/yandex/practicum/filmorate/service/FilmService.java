@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @Service
@@ -66,7 +67,7 @@ public class FilmService {
             }
         }
         film.setGenres(genres);
-
+        validateReleaseDate(film.getReleaseDate());
         return filmStorage.create(film);
     }
 
@@ -84,11 +85,18 @@ public class FilmService {
             }
         }
         film.setGenres(genres);
-
+        validateReleaseDate(film.getReleaseDate());
         return filmStorage.update(film);
     }
 
     public Film findById(final Long id) {
         return filmStorage.findById(id);
+    }
+
+    private void validateReleaseDate(LocalDate releaseDate) {
+        LocalDate firstFilmDate = LocalDate.of(1895, 12, 28);
+        if (releaseDate.isBefore(firstFilmDate)) {
+            throw new IllegalArgumentException("Дата релиза не может быть раньше 28.12.1895");
+        }
     }
 }
