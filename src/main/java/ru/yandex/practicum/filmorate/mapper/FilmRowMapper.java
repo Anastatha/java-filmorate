@@ -24,7 +24,8 @@ public class FilmRowMapper implements RowMapper<Film> {
         film.setDuration(rs.getInt("duration"));
 
         long mpaId = rs.getLong("mpa_id");
-        film.setMpa(new MpaRating(mpaId, null));
+        String mpaName = rs.getString("mpa_name");
+        film.setMpa(new MpaRating(mpaId, mpaName));
 
         return film;
     }

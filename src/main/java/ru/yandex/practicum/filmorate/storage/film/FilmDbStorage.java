@@ -35,12 +35,8 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film findById(Long id) {
-        String sql = """
-                    SELECT f.*, m.name AS mpa_name
-                    FROM films f
-                    JOIN mpa_ratings m ON f.mpa_id = m.id
-                    WHERE f.id = ?
-                """;
+        String sql = "SELECT f.*, m.name AS mpa_name FROM films f JOIN mpa_ratings m ON f.mpa_id = m.id WHERE f.id = ?";
+
 
         Film film = jdbcTemplate.query(sql, new FilmRowMapper(), id)
                 .stream()
@@ -48,6 +44,7 @@ public class FilmDbStorage implements FilmStorage {
                 .orElseThrow(() -> new NoSuchElementException("Фильм не найден"));
 
         loadGenres(film);
+
         return film;
     }
 
@@ -136,21 +133,17 @@ public class FilmDbStorage implements FilmStorage {
                     FROM genres g
                     JOIN film_genres fg ON g.id = fg.genre_id
                     WHERE fg.film_id = ?
+                    ORDER BY g.id
                 """;
 
-        Set<Genre> genres = new HashSet<>(jdbcTemplate.query(sql,
-                new GenreRowMapper(),
-                film.getId()
-        ));
-
-        film.setGenres(genres);
+        List<Genre> genres = jdbcTemplate.query(sql, new GenreRowMapper(), film.getId());
+        film.setGenres(new LinkedHashSet<>(genres));
     }
 
     private void saveGenres(Film film) {
-        if (film.getGenres() == null) return;
+        if (film.getGenres() == null || film.getGenres().isEmpty()) return;
 
-        String sql = "INSERT INTO film_genres(film_id, genre_id) VALUES (?, ?)";
-
+        String sql = "MERGE INTO film_genres (film_id, genre_id) KEY(film_id, genre_id) VALUES (?, ?)";
         for (Genre genre : film.getGenres()) {
             jdbcTemplate.update(sql, film.getId(), genre.getId());
         }

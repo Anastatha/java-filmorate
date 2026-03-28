@@ -79,28 +79,25 @@ public class UserDbStorage implements UserStorage {
 //    }
     @Override
     public void addFriend(Long userId, Long friendId) {
-        String sql = "INSERT INTO friendships(user_id, friend_id, status) VALUES (?, ?, 'CONFIRMED')";
+        String sql = "MERGE INTO friendships (user_id, friend_id, status) KEY(user_id, friend_id) VALUES (?, ?, 'CONFIRMED')";
         jdbcTemplate.update(sql, userId, friendId);
     }
 
     @Override
     public void removeFriend(Long userId, Long friendId) {
-        String sql = "DELETE FROM friends WHERE user_id=? AND friend_id=?";
+        String sql = "DELETE FROM friendships WHERE user_id=? AND friend_id=?";
         jdbcTemplate.update(sql, userId, friendId);
     }
 
     @Override
     public List<User> getFriends(Long userId) {
-        String sql = "SELECT u.* FROM users u join friends f ON u.id = f.friend_id WHERE f.user_id = ?";
-
-
+        String sql = "SELECT u.* FROM users u JOIN friendships f ON u.id = f.friend_id WHERE f.user_id = ?";
         return jdbcTemplate.query(sql, new UserRowMapper(), userId);
     }
 
     @Override
     public List<User> getCommonFriends(Long userId, Long otherId) {
-        String sql = "SELECT u.* FROM users u WHERE u.id IN (SELECT f1.friend_id FROM friends f1 JOIN friends f2 ON f1.friend_id = f2.friend_id WHERE f1.user_id = ? AND f2.user_id = ?)";
-
+        String sql = "SELECT u.* FROM users u WHERE u.id IN (SELECT f1.friend_id FROM friendships f1 JOIN friendships f2 ON f1.friend_id = f2.friend_id WHERE f1.user_id = ? AND f2.user_id = ?";
         return jdbcTemplate.query(sql, new UserRowMapper(), userId, otherId);
     }
 }
