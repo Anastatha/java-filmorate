@@ -29,12 +29,12 @@ public class InMemoryFilmStorage implements FilmStorage {
     );
 
     private final Map<Long, Genre> genres = Map.of(
-            1L, new Genre(1L, "COMEDY"),
-            2L, new Genre(2L, "DRAMA"),
-            3L, new Genre(3L, "CARTOON"),
-            4L, new Genre(4L, "THRILLER"),
-            5L, new Genre(5L, "DOCUMENTARY"),
-            6L, new Genre(6L, "ACTION")
+            1L, new Genre(1L, "Комедия"),
+            2L, new Genre(2L, "Драма"),
+            3L, new Genre(3L, "Комедия"),
+            4L, new Genre(4L, "Триллер"),
+            5L, new Genre(5L, "Документальный"),
+            6L, new Genre(6L, "Экшен")
     );
 
     @Override
@@ -95,5 +95,25 @@ public class InMemoryFilmStorage implements FilmStorage {
                     .collect(Collectors.toSet());
             film.setGenres(filmGenres);
         }
+    }
+
+    @Override
+    public void addLike(Long filmId, Long userId) {
+        Film film = findById(filmId);
+        film.getLikes().add(userId);
+    }
+
+    @Override
+    public void removeLike(Long filmId, Long userId) {
+        Film film = findById(filmId);
+        film.getLikes().remove(userId);
+    }
+
+    @Override
+    public List<Film> getPopularFilms(int count) {
+        return films.values().stream()
+                .sorted(Comparator.comparingInt((Film f) -> f.getLikes().size()).reversed())
+                .limit(count)
+                .toList();
     }
 }
