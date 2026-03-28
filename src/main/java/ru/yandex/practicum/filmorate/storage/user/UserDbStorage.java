@@ -72,11 +72,6 @@ public class UserDbStorage implements UserStorage {
                 .orElseThrow(() -> new NoSuchElementException("Пользователь не найден"));
     }
 
-    //    @Override
-//    public void addFriend(Long userId, Long friendId) {
-//        String sql = "INSERT INTO friends(user_id, friend_id) VALUES (?, ?)";
-//        jdbcTemplate.update(sql, userId, friendId);
-//    }
     @Override
     public void addFriend(Long userId, Long friendId) {
         String sql = "MERGE INTO friendships (user_id, friend_id, status) KEY(user_id, friend_id) VALUES (?, ?, 'CONFIRMED')";
