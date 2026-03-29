@@ -28,7 +28,7 @@ class FilmDbStorageTest {
     private final FilmDbStorage filmStorage;
     private final MpaDbStorage mpaStorage;
     private final GenreDbStorage genreStorage;
-    private final UserDbStorage userStorage; // ✅ ДОБАВИЛИ
+    private final UserDbStorage userStorage;
 
     @Test
     void testCreateAndFindFilm() {

@@ -30,7 +30,7 @@ public class FilmService {
     }
 
     public void addLike(Long filmId, Long userId) {
-        Film film = filmStorage.findById(filmId);
+        filmStorage.findById(filmId);
         filmStorage.findById(filmId);
         userStorage.findById(userId);
 
