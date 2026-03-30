@@ -52,26 +52,7 @@ public class FilmService {
         return filmStorage.getFilms();
     }
 
-    public Film create(Film film) {
-        if (film.getMpa() != null) {
-            Long mpaId = film.getMpa().getId();
-            film.setMpa(mpaStorage.findById(mpaId));
-        } else {
-            throw new IllegalArgumentException("MPA должен быть указан");
-        }
-
-        Set<Genre> genres = new HashSet<>();
-        if (film.getGenres() != null) {
-            for (Genre genre : film.getGenres()) {
-                genres.add(genreStorage.findById(genre.getId()));
-            }
-        }
-        film.setGenres(genres);
-        validateReleaseDate(film.getReleaseDate());
-        return filmStorage.create(film);
-    }
-
-    public Film update(Film film) {
+    private void prepareFilm(Film film) {
         if (film.getMpa() != null) {
             film.setMpa(mpaStorage.findById(film.getMpa().getId()));
         } else {
@@ -85,7 +66,17 @@ public class FilmService {
             }
         }
         film.setGenres(genres);
+
         validateReleaseDate(film.getReleaseDate());
+    }
+
+    public Film create(Film film) {
+        prepareFilm(film);
+        return filmStorage.create(film);
+    }
+
+    public Film update(Film film) {
+        prepareFilm(film);
         return filmStorage.update(film);
     }
 
