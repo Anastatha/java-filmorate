@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.service;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -19,8 +18,10 @@ public class FilmService {
     private final GenreStorage genreStorage;
     private final MpaStorage mpaStorage;
 
-    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage,
-                       @Qualifier("userDbStorage") UserStorage userStorage,
+    private static final LocalDate FIRST_FILM_DATE = LocalDate.of(1895, 12, 28);
+
+    public FilmService(FilmStorage filmStorage,
+                       UserStorage userStorage,
                        GenreStorage genreStorage,
                        MpaStorage mpaStorage) {
         this.filmStorage = filmStorage;
@@ -52,6 +53,7 @@ public class FilmService {
         return filmStorage.getFilms();
     }
 
+
     private void prepareFilm(Film film) {
         if (film.getMpa() != null) {
             film.setMpa(mpaStorage.findById(film.getMpa().getId()));
@@ -59,13 +61,18 @@ public class FilmService {
             throw new IllegalArgumentException("MPA должен быть указан");
         }
 
-        Set<Genre> genres = new HashSet<>();
-        if (film.getGenres() != null) {
-            for (Genre genre : film.getGenres()) {
-                genres.add(genreStorage.findById(genre.getId()));
-            }
+        if (film.getGenres() != null && !film.getGenres().isEmpty()) {
+
+            List<Long> ids = film.getGenres().stream()
+                    .map(Genre::getId)
+                    .toList();
+
+            Collection<Genre> genresFromDb = genreStorage.findAllByIds(ids);
+
+            film.setGenres(new LinkedHashSet<>(genresFromDb));
+        } else {
+            film.setGenres(new LinkedHashSet<>());
         }
-        film.setGenres(genres);
 
         validateReleaseDate(film.getReleaseDate());
     }
@@ -85,8 +92,7 @@ public class FilmService {
     }
 
     private void validateReleaseDate(LocalDate releaseDate) {
-        LocalDate firstFilmDate = LocalDate.of(1895, 12, 28);
-        if (releaseDate.isBefore(firstFilmDate)) {
+        if (releaseDate.isBefore(FIRST_FILM_DATE)) {
             throw new IllegalArgumentException("Дата релиза не может быть раньше 28.12.1895");
         }
     }

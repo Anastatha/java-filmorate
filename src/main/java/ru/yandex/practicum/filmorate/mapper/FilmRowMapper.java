@@ -6,6 +6,8 @@ import ru.yandex.practicum.filmorate.model.MpaRating;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class FilmRowMapper implements RowMapper<Film> {
 
@@ -16,10 +18,7 @@ public class FilmRowMapper implements RowMapper<Film> {
         film.setId(rs.getLong("id"));
         film.setName(rs.getString("name"));
         film.setDescription(rs.getString("description"));
-
-        if (rs.getDate("release_date") != null) {
-            film.setReleaseDate(rs.getDate("release_date").toLocalDate());
-        }
+        film.setReleaseDate(rs.getObject("release_date", LocalDate.class));
 
         film.setDuration(rs.getInt("duration"));
 
