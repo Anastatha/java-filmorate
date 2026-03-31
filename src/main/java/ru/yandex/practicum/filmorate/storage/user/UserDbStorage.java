@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.mapper.UserRowMapper;
 import ru.yandex.practicum.filmorate.model.User;
 
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.util.Collection;
 import java.util.List;
@@ -38,7 +39,7 @@ public class UserDbStorage implements UserStorage {
             ps.setString(1, user.getEmail());
             ps.setString(2, user.getLogin());
             ps.setString(3, user.getName());
-            ps.setDate(4, java.sql.Date.valueOf(user.getBirthday()));
+            ps.setDate(4, Date.valueOf(user.getBirthday()));
             return ps;
         }, keyHolder);
 
