@@ -55,8 +55,12 @@ public class UserService {
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
+        boolean updated = userStorage.update(user);
+        if (!updated) {
+            throw new NoSuchElementException("Пользователь не найден");
+        }
 
-        return userStorage.update(user);
+        return user;
     }
 
     public User findById(final Long id) {

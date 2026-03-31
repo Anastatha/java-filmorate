@@ -48,7 +48,7 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public User update(User user) {
+    public boolean update(User user) {
         String sql = "UPDATE users SET email=?, login=?, name=?, birthday=? WHERE id=?";
 
         int updated = jdbcTemplate.update(sql,
@@ -59,11 +59,7 @@ public class UserDbStorage implements UserStorage {
                 user.getId()
         );
 
-        if (updated == 0) {
-            throw new NoSuchElementException("Пользователь не найден");
-        }
-
-        return user;
+        return updated > 0;
     }
 
     @Override
