@@ -1,6 +1,8 @@
 package ru.yandex.practicum.filmorate.service;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
@@ -67,7 +69,17 @@ public class FilmService {
                     .map(Genre::getId)
                     .toList();
 
-            Collection<Genre> genresFromDb = genreStorage.findAllByIds(ids);
+            Collection<Genre> genresFromDb;
+
+            try {
+                genresFromDb = genreStorage.findAllByIds(ids);
+            } catch (Exception e) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Жанр не найден");
+            }
+
+            if (genresFromDb.size() != ids.size()) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Жанр не найден");
+            }
 
             film.setGenres(new LinkedHashSet<>(genresFromDb));
         } else {

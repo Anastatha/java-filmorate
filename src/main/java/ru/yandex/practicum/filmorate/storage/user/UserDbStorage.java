@@ -26,18 +26,16 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User create(User user) {
-        String sql = "INSERT INTO users(email, login, name, birthday) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO users(email, login, name, birthday) VALUES (?, ?, ?, ?) RETURNING id";
 
-        jdbcTemplate.update(sql,
+        Long id = jdbcTemplate.queryForObject(sql, Long.class,
                 user.getEmail(),
                 user.getLogin(),
                 user.getName(),
                 user.getBirthday()
         );
 
-        Long id = jdbcTemplate.queryForObject("SELECT MAX(id) FROM users", Long.class);
         user.setId(id);
-
         return user;
     }
 
