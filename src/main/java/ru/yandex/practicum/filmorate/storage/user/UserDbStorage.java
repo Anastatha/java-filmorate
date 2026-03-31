@@ -1,10 +1,13 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.mapper.UserRowMapper;
 import ru.yandex.practicum.filmorate.model.User;
 
+import java.sql.PreparedStatement;
 import java.util.Collection;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -26,16 +29,20 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User create(User user) {
-        String sql = "INSERT INTO users(email, login, name, birthday) VALUES (?, ?, ?, ?) RETURNING id";
+        String sql = "INSERT INTO users(email, login, name, birthday) VALUES (?, ?, ?, ?)";
 
-        Long id = jdbcTemplate.queryForObject(sql, Long.class,
-                user.getEmail(),
-                user.getLogin(),
-                user.getName(),
-                user.getBirthday()
-        );
+        KeyHolder keyHolder = new GeneratedKeyHolder();
 
-        user.setId(id);
+        jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(sql, new String[]{"id"});
+            ps.setString(1, user.getEmail());
+            ps.setString(2, user.getLogin());
+            ps.setString(3, user.getName());
+            ps.setDate(4, java.sql.Date.valueOf(user.getBirthday()));
+            return ps;
+        }, keyHolder);
+
+        user.setId(keyHolder.getKey().longValue());
         return user;
     }
 
