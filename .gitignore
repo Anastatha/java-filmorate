@@ -1,4 +1,4 @@
-*.class
+git rm --cached $(find . -name .DS_Store)*.class
 *.log
 *.jar
 *.war

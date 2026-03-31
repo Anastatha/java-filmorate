@@ -4,10 +4,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Service
 public class UserService {
@@ -18,42 +15,28 @@ public class UserService {
     }
 
     public void addFriend(final Long userId, final Long friendId) {
-        User user = userStorage.findById(userId);
-        User friend = userStorage.findById(friendId);
-
-        user.getFriends().add(friendId);
-        friend.getFriends().add(userId);
+        userStorage.findById(userId);
+        userStorage.findById(friendId);
+        userStorage.addFriend(userId, friendId);
     }
 
     public void removeFriend(Long userId, Long friendId) {
-        User user = userStorage.findById(userId);
-        User friend = userStorage.findById(friendId);
+        userStorage.findById(userId);
+        userStorage.findById(friendId);
 
-        user.getFriends().remove(friendId);
-        friend.getFriends().remove(userId);
-    }
-
-    public List<User> getCommonFriends(Long userId, Long otherId) {
-        User user = userStorage.findById(userId);
-        User other = userStorage.findById(otherId);
-
-        Set<Long> commonIds = user.getFriends()
-                .stream()
-                .filter(other.getFriends()::contains)
-                .collect(Collectors.toSet());
-
-        return commonIds.stream()
-                .map(userStorage::findById)
-                .collect(Collectors.toList());
+        userStorage.removeFriend(userId, friendId);
     }
 
     public List<User> getFriends(Long userId) {
-        User user = userStorage.findById(userId);
+        userStorage.findById(userId);
+        return userStorage.getFriends(userId);
+    }
 
-        return user.getFriends()
-                .stream()
-                .map(userStorage::findById)
-                .toList();
+    public List<User> getCommonFriends(Long userId, Long otherId) {
+        userStorage.findById(userId);
+        userStorage.findById(otherId);
+
+        return userStorage.getCommonFriends(userId, otherId);
     }
 
     public Collection<User> getUsers() {
@@ -72,8 +55,12 @@ public class UserService {
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
+        boolean updated = userStorage.update(user);
+        if (!updated) {
+            throw new NoSuchElementException("Пользователь не найден");
+        }
 
-        return userStorage.update(user);
+        return user;
     }
 
     public User findById(final Long id) {
